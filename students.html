@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Étudiants - Centre de Formation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">📚</div>
+                    <span>FormaPro</span>
+                </div>
+                <p class="sidebar-subtitle">Centre de Formation</p>
+            </div>
+
+            <nav class="nav-menu">
+                <ul class="nav-section">
+                    <li class="nav-section-title">Principal</li>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <span class="nav-icon">🏠</span>
+                            <span>Tableau de Bord</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="schedule.html" class="nav-link">
+                            <span class="nav-icon">📅</span>
+                            <span>Planning</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="generate.html" class="nav-link">
+                            <span class="nav-icon">⚡</span>
+                            <span>Générer Planning</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="nav-section">
+                    <li class="nav-section-title">Gestion</li>
+                    <li class="nav-item">
+                        <a href="trainers.html" class="nav-link">
+                            <span class="nav-icon">👨‍🏫</span>
+                            <span>Formateurs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="students.html" class="nav-link active">
+                            <span class="nav-icon">👨‍🎓</span>
+                            <span>Étudiants</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="rooms.html" class="nav-link">
+                            <span class="nav-icon">🏢</span>
+                            <span>Salles</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="materials.html" class="nav-link">
+                            <span class="nav-icon">💻</span>
+                            <span>Matériel</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="nav-section">
+                    <li class="nav-section-title">Analyse</li>
+                    <li class="nav-item">
+                        <a href="statistics.html" class="nav-link">
+                            <span class="nav-icon">📊</span>
+                            <span>Statistiques</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Gestion des Étudiants</h1>
+                <p class="page-description">Gérez les étudiants et leurs groupes</p>
+            </div>
+
+            <!-- Actions Bar -->
+            <div class="flex items-center justify-between mb-6">
+                <div class="form-group" style="margin: 0; flex: 1; max-width: 400px;">
+                    <input type="text" class="form-input" id="search-input" placeholder="Rechercher un étudiant..."
+                        onkeyup="handleSearch()">
+                </div>
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <span>➕</span>
+                    <span>Ajouter un Étudiant</span>
+                </button>
+            </div>
+
+            <!-- Students Table -->
+            <div class="card">
+                <div class="table-container">
+                    <table class="table" id="students-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nom</th>
+                                <th>Groupe</th>
+                                <th>Email</th>
+                                <th>Téléphone</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="7" style="text-align: center; color: var(--text-tertiary);">
+                                    Chargement des données...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let studentsData = [];
+        let currentStudentId = null;
+
+        // Load students data
+        async function loadStudents() {
+            try {
+                showLoading();
+                studentsData = await API.students.getAll();
+                renderStudentsTable(studentsData);
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading students:', error);
+                hideLoading();
+                showToast('Erreur lors du chargement des étudiants', 'danger');
+
+                const tbody = document.querySelector('#students-table tbody');
+                tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--text-tertiary); padding: 40px;">
+              Aucun étudiant trouvé. <a href="#" onclick="openAddModal(); return false;">Ajouter le premier étudiant</a>
+            </td>
+          </tr>
+        `;
+            }
+        }
+
+        // Render students table
+        function renderStudentsTable(data) {
+            const tbody = document.querySelector('#students-table tbody');
+
+            if (data.length === 0) {
+                tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--text-tertiary); padding: 40px;">
+              Aucun étudiant trouvé. <a href="#" onclick="openAddModal(); return false;">Ajouter le premier étudiant</a>
+            </td>
+          </tr>
+        `;
+                return;
+            }
+
+            tbody.innerHTML = data.map(student => `
+        <tr>
+          <td>${student.id}</td>
+          <td><strong>${student.nom || '-'}</strong></td>
+          <td><span class="badge badge-primary">${student.groupe || '-'}</span></td>
+          <td>${student.email || '-'}</td>
+          <td>${student.telephone || '-'}</td>
+          <td><span class="badge badge-success">Actif</span></td>
+          <td>
+            <div class="flex gap-2">
+              <button class="btn btn-sm btn-secondary" onclick="openEditModal(${student.id})">
+                ✏️ Modifier
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="deleteStudent(${student.id})">
+                🗑️ Supprimer
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+        }
+
+        // Search functionality
+        function handleSearch() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const filtered = studentsData.filter(student => {
+                return (
+                    (student.nom || '').toLowerCase().includes(searchTerm) ||
+                    (student.groupe || '').toLowerCase().includes(searchTerm) ||
+                    (student.email || '').toLowerCase().includes(searchTerm)
+                );
+            });
+            renderStudentsTable(filtered);
+        }
+
+        // Open add modal
+        function openAddModal() {
+            currentStudentId = null;
+            const modal = new Modal('student-modal');
+
+            const content = `
+        <form id="student-form">
+          <div class="form-group">
+            <label class="form-label required">Nom complet</label>
+            <input type="text" class="form-input" id="student-nom" required placeholder="Ex: Marie Martin">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Groupe</label>
+            <input type="text" class="form-input" id="student-groupe" required placeholder="Ex: Groupe A">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Email</label>
+            <input type="email" class="form-input" id="student-email" required placeholder="Ex: marie.martin@example.com">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Téléphone</label>
+            <input type="tel" class="form-input" id="student-telephone" placeholder="Ex: 06 12 34 56 78">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Compatibilités</label>
+            <textarea class="form-textarea" id="student-compatibilites" placeholder="Ex: Préfère les cours du matin"></textarea>
+            <div class="form-help">Indiquez les préférences et compatibilités</div>
+          </div>
+        </form>
+      `;
+
+            const footer = `
+        <button class="btn btn-secondary" onclick="closeModal('student-modal')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveStudent()">Ajouter</button>
+      `;
+
+            modal.create('Ajouter un Étudiant', content, footer);
+            modal.open();
+        }
+
+        // Open edit modal
+        async function openEditModal(id) {
+            currentStudentId = id;
+            const student = studentsData.find(s => s.id === id);
+
+            if (!student) {
+                showToast('Étudiant non trouvé', 'danger');
+                return;
+            }
+
+            const modal = new Modal('student-modal');
+
+            const content = `
+        <form id="student-form">
+          <div class="form-group">
+            <label class="form-label required">Nom complet</label>
+            <input type="text" class="form-input" id="student-nom" required value="${student.nom || ''}">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Groupe</label>
+            <input type="text" class="form-input" id="student-groupe" required value="${student.groupe || ''}">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Email</label>
+            <input type="email" class="form-input" id="student-email" required value="${student.email || ''}">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Téléphone</label>
+            <input type="tel" class="form-input" id="student-telephone" value="${student.telephone || ''}">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Compatibilités</label>
+            <textarea class="form-textarea" id="student-compatibilites">${student.compatibilites || ''}</textarea>
+            <div class="form-help">Indiquez les préférences et compatibilités</div>
+          </div>
+        </form>
+      `;
+
+            const footer = `
+        <button class="btn btn-secondary" onclick="closeModal('student-modal')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveStudent()">Enregistrer</button>
+      `;
+
+            modal.create('Modifier l\'Étudiant', content, footer);
+            modal.open();
+        }
+
+        // Save student
+        async function saveStudent() {
+            if (!validateForm('student-form')) {
+                return;
+            }
+
+            const data = {
+                nom: document.getElementById('student-nom').value,
+                groupe: document.getElementById('student-groupe').value,
+                email: document.getElementById('student-email').value,
+                telephone: document.getElementById('student-telephone').value,
+                compatibilites: document.getElementById('student-compatibilites').value
+            };
+
+            try {
+                showLoading();
+
+                if (currentStudentId) {
+                    await API.students.update(currentStudentId, data);
+                    showToast('Étudiant modifié avec succès', 'success');
+                } else {
+                    await API.students.create(data);
+                    showToast('Étudiant ajouté avec succès', 'success');
+                }
+
+                closeModal('student-modal');
+                await loadStudents();
+                hideLoading();
+            } catch (error) {
+                console.error('Error saving student:', error);
+                hideLoading();
+                showToast('Erreur lors de l\'enregistrement', 'danger');
+            }
+        }
+
+        // Delete student
+        async function deleteStudent(id) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer cet étudiant ?')) {
+                return;
+            }
+
+            try {
+                showLoading();
+                await API.students.delete(id);
+                showToast('Étudiant supprimé avec succès', 'success');
+                await loadStudents();
+                hideLoading();
+            } catch (error) {
+                console.error('Error deleting student:', error);
+                hideLoading();
+                showToast('Erreur lors de la suppression', 'danger');
+            }
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStudents();
+        });
+    </script>
+</body>
+
+</html>

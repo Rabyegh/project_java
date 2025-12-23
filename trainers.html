@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Formateurs - Centre de Formation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">📚</div>
+                    <span>FormaPro</span>
+                </div>
+                <p class="sidebar-subtitle">Centre de Formation</p>
+            </div>
+
+            <nav class="nav-menu">
+                <ul class="nav-section">
+                    <li class="nav-section-title">Principal</li>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <span class="nav-icon">🏠</span>
+                            <span>Tableau de Bord</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="schedule.html" class="nav-link">
+                            <span class="nav-icon">📅</span>
+                            <span>Planning</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="generate.html" class="nav-link">
+                            <span class="nav-icon">⚡</span>
+                            <span>Générer Planning</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="nav-section">
+                    <li class="nav-section-title">Gestion</li>
+                    <li class="nav-item">
+                        <a href="trainers.html" class="nav-link active">
+                            <span class="nav-icon">👨‍🏫</span>
+                            <span>Formateurs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="students.html" class="nav-link">
+                            <span class="nav-icon">👨‍🎓</span>
+                            <span>Étudiants</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="rooms.html" class="nav-link">
+                            <span class="nav-icon">🏢</span>
+                            <span>Salles</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="materials.html" class="nav-link">
+                            <span class="nav-icon">💻</span>
+                            <span>Matériel</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="nav-section">
+                    <li class="nav-section-title">Analyse</li>
+                    <li class="nav-item">
+                        <a href="statistics.html" class="nav-link">
+                            <span class="nav-icon">📊</span>
+                            <span>Statistiques</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Gestion des Formateurs</h1>
+                <p class="page-description">Gérez les formateurs et leurs disponibilités</p>
+            </div>
+
+            <!-- Actions Bar -->
+            <div class="flex items-center justify-between mb-6">
+                <div class="form-group" style="margin: 0; flex: 1; max-width: 400px;">
+                    <input type="text" class="form-input" id="search-input" placeholder="Rechercher un formateur..."
+                        onkeyup="handleSearch()">
+                </div>
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <span>➕</span>
+                    <span>Ajouter un Formateur</span>
+                </button>
+            </div>
+
+            <!-- Trainers Table -->
+            <div class="card">
+                <div class="table-container">
+                    <table class="table" id="trainers-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nom</th>
+                                <th>Spécialité</th>
+                                <th>Email</th>
+                                <th>Téléphone</th>
+                                <th>Disponibilité</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="7" style="text-align: center; color: var(--text-tertiary);">
+                                    Chargement des données...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let trainersData = [];
+        let currentTrainerId = null;
+
+        // Load trainers data
+        async function loadTrainers() {
+            try {
+                showLoading();
+                trainersData = await API.trainers.getAll();
+                renderTrainersTable(trainersData);
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading trainers:', error);
+                hideLoading();
+                showToast('Erreur lors du chargement des formateurs', 'danger');
+
+                // Show empty state
+                const tbody = document.querySelector('#trainers-table tbody');
+                tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--text-tertiary); padding: 40px;">
+              Aucun formateur trouvé. <a href="#" onclick="openAddModal(); return false;">Ajouter le premier formateur</a>
+            </td>
+          </tr>
+        `;
+            }
+        }
+
+        // Render trainers table
+        function renderTrainersTable(data) {
+            const tbody = document.querySelector('#trainers-table tbody');
+
+            if (data.length === 0) {
+                tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--text-tertiary); padding: 40px;">
+              Aucun formateur trouvé. <a href="#" onclick="openAddModal(); return false;">Ajouter le premier formateur</a>
+            </td>
+          </tr>
+        `;
+                return;
+            }
+
+            tbody.innerHTML = data.map(trainer => `
+        <tr>
+          <td>${trainer.id}</td>
+          <td><strong>${trainer.nom || '-'}</strong></td>
+          <td><span class="badge badge-primary">${trainer.specialite || '-'}</span></td>
+          <td>${trainer.email || '-'}</td>
+          <td>${trainer.telephone || '-'}</td>
+          <td>${trainer.disponibilite || '-'}</td>
+          <td>
+            <div class="flex gap-2">
+              <button class="btn btn-sm btn-secondary" onclick="openEditModal(${trainer.id})">
+                ✏️ Modifier
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="deleteTrainer(${trainer.id})">
+                🗑️ Supprimer
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+        }
+
+        // Search functionality
+        function handleSearch() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const filtered = trainersData.filter(trainer => {
+                return (
+                    (trainer.nom || '').toLowerCase().includes(searchTerm) ||
+                    (trainer.specialite || '').toLowerCase().includes(searchTerm) ||
+                    (trainer.email || '').toLowerCase().includes(searchTerm)
+                );
+            });
+            renderTrainersTable(filtered);
+        }
+
+        // Open add modal
+        function openAddModal() {
+            currentTrainerId = null;
+            const modal = new Modal('trainer-modal');
+
+            const content = `
+        <form id="trainer-form">
+          <div class="form-group">
+            <label class="form-label required">Nom complet</label>
+            <input type="text" class="form-input" id="trainer-nom" required placeholder="Ex: Jean Dupont">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Spécialité</label>
+            <input type="text" class="form-input" id="trainer-specialite" required placeholder="Ex: Développement Web">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Email</label>
+            <input type="email" class="form-input" id="trainer-email" required placeholder="Ex: jean.dupont@example.com">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Téléphone</label>
+            <input type="tel" class="form-input" id="trainer-telephone" placeholder="Ex: 06 12 34 56 78">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Disponibilité</label>
+            <textarea class="form-textarea" id="trainer-disponibilite" placeholder="Ex: Lundi-Vendredi 9h-17h"></textarea>
+            <div class="form-help">Indiquez les créneaux horaires disponibles</div>
+          </div>
+        </form>
+      `;
+
+            const footer = `
+        <button class="btn btn-secondary" onclick="closeModal('trainer-modal')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveTrainer()">Ajouter</button>
+      `;
+
+            modal.create('Ajouter un Formateur', content, footer);
+            modal.open();
+        }
+
+        // Open edit modal
+        async function openEditModal(id) {
+            currentTrainerId = id;
+            const trainer = trainersData.find(t => t.id === id);
+
+            if (!trainer) {
+                showToast('Formateur non trouvé', 'danger');
+                return;
+            }
+
+            const modal = new Modal('trainer-modal');
+
+            const content = `
+        <form id="trainer-form">
+          <div class="form-group">
+            <label class="form-label required">Nom complet</label>
+            <input type="text" class="form-input" id="trainer-nom" required value="${trainer.nom || ''}">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Spécialité</label>
+            <input type="text" class="form-input" id="trainer-specialite" required value="${trainer.specialite || ''}">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Email</label>
+            <input type="email" class="form-input" id="trainer-email" required value="${trainer.email || ''}">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Téléphone</label>
+            <input type="tel" class="form-input" id="trainer-telephone" value="${trainer.telephone || ''}">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Disponibilité</label>
+            <textarea class="form-textarea" id="trainer-disponibilite">${trainer.disponibilite || ''}</textarea>
+            <div class="form-help">Indiquez les créneaux horaires disponibles</div>
+          </div>
+        </form>
+      `;
+
+            const footer = `
+        <button class="btn btn-secondary" onclick="closeModal('trainer-modal')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveTrainer()">Enregistrer</button>
+      `;
+
+            modal.create('Modifier le Formateur', content, footer);
+            modal.open();
+        }
+
+        // Save trainer
+        async function saveTrainer() {
+            if (!validateForm('trainer-form')) {
+                return;
+            }
+
+            const data = {
+                nom: document.getElementById('trainer-nom').value,
+                specialite: document.getElementById('trainer-specialite').value,
+                email: document.getElementById('trainer-email').value,
+                telephone: document.getElementById('trainer-telephone').value,
+                disponibilite: document.getElementById('trainer-disponibilite').value
+            };
+
+            try {
+                showLoading();
+
+                if (currentTrainerId) {
+                    await API.trainers.update(currentTrainerId, data);
+                    showToast('Formateur modifié avec succès', 'success');
+                } else {
+                    await API.trainers.create(data);
+                    showToast('Formateur ajouté avec succès', 'success');
+                }
+
+                closeModal('trainer-modal');
+                await loadTrainers();
+                hideLoading();
+            } catch (error) {
+                console.error('Error saving trainer:', error);
+                hideLoading();
+                showToast('Erreur lors de l\'enregistrement', 'danger');
+            }
+        }
+
+        // Delete trainer
+        async function deleteTrainer(id) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce formateur ?')) {
+                return;
+            }
+
+            try {
+                showLoading();
+                await API.trainers.delete(id);
+                showToast('Formateur supprimé avec succès', 'success');
+                await loadTrainers();
+                hideLoading();
+            } catch (error) {
+                console.error('Error deleting trainer:', error);
+                hideLoading();
+                showToast('Erreur lors de la suppression', 'danger');
+            }
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTrainers();
+        });
+    </script>
+</body>
+
+</html>

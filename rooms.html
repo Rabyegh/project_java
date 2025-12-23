@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Salles - Centre de Formation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">📚</div>
+                    <span>FormaPro</span>
+                </div>
+                <p class="sidebar-subtitle">Centre de Formation</p>
+            </div>
+
+            <nav class="nav-menu">
+                <ul class="nav-section">
+                    <li class="nav-section-title">Principal</li>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <span class="nav-icon">🏠</span>
+                            <span>Tableau de Bord</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="schedule.html" class="nav-link">
+                            <span class="nav-icon">📅</span>
+                            <span>Planning</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="generate.html" class="nav-link">
+                            <span class="nav-icon">⚡</span>
+                            <span>Générer Planning</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="nav-section">
+                    <li class="nav-section-title">Gestion</li>
+                    <li class="nav-item">
+                        <a href="trainers.html" class="nav-link">
+                            <span class="nav-icon">👨‍🏫</span>
+                            <span>Formateurs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="students.html" class="nav-link">
+                            <span class="nav-icon">👨‍🎓</span>
+                            <span>Étudiants</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="rooms.html" class="nav-link active">
+                            <span class="nav-icon">🏢</span>
+                            <span>Salles</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="materials.html" class="nav-link">
+                            <span class="nav-icon">💻</span>
+                            <span>Matériel</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="nav-section">
+                    <li class="nav-section-title">Analyse</li>
+                    <li class="nav-item">
+                        <a href="statistics.html" class="nav-link">
+                            <span class="nav-icon">📊</span>
+                            <span>Statistiques</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Gestion des Salles</h1>
+                <p class="page-description">Gérez les salles et leurs capacités</p>
+            </div>
+
+            <!-- Actions Bar -->
+            <div class="flex items-center justify-between mb-6">
+                <div class="form-group" style="margin: 0; flex: 1; max-width: 400px;">
+                    <input type="text" class="form-input" id="search-input" placeholder="Rechercher une salle..."
+                        onkeyup="handleSearch()">
+                </div>
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <span>➕</span>
+                    <span>Ajouter une Salle</span>
+                </button>
+            </div>
+
+            <!-- Rooms Grid -->
+            <div class="grid grid-cols-3 gap-6" id="rooms-grid">
+                <div class="card" style="text-align: center; padding: 60px;">
+                    <p style="color: var(--text-tertiary);">Chargement des données...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let roomsData = [];
+        let currentRoomId = null;
+
+        // Load rooms data
+        async function loadRooms() {
+            try {
+                showLoading();
+                roomsData = await API.rooms.getAll();
+                renderRoomsGrid(roomsData);
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading rooms:', error);
+                hideLoading();
+                showToast('Erreur lors du chargement des salles', 'danger');
+
+                const grid = document.getElementById('rooms-grid');
+                grid.innerHTML = `
+          <div class="card" style="text-align: center; padding: 60px;">
+            <p style="color: var(--text-tertiary);">
+              Aucune salle trouvée. <a href="#" onclick="openAddModal(); return false;">Ajouter la première salle</a>
+            </p>
+          </div>
+        `;
+            }
+        }
+
+        // Render rooms grid
+        function renderRoomsGrid(data) {
+            const grid = document.getElementById('rooms-grid');
+
+            if (data.length === 0) {
+                grid.innerHTML = `
+          <div class="card" style="text-align: center; padding: 60px;">
+            <p style="color: var(--text-tertiary);">
+              Aucune salle trouvée. <a href="#" onclick="openAddModal(); return false;">Ajouter la première salle</a>
+            </p>
+          </div>
+        `;
+                return;
+            }
+
+            grid.innerHTML = data.map(room => `
+        <div class="card fade-in">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+            <div style="font-size: 2rem;">🏢</div>
+            <span class="badge badge-success">Disponible</span>
+          </div>
+          <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 8px;">${room.nom || 'Sans nom'}</h3>
+          <div style="color: var(--text-secondary); margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span>👥</span>
+              <span>Capacité: ${room.capacite || 0} personnes</span>
+            </div>
+            ${room.equipements ? `
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span>🔧</span>
+                <span>${room.equipements}</span>
+              </div>
+            ` : ''}
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-sm btn-secondary" onclick="openEditModal(${room.id})" style="flex: 1;">
+              ✏️ Modifier
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="deleteRoom(${room.id})">
+              🗑️
+            </button>
+          </div>
+        </div>
+      `).join('');
+        }
+
+        // Search functionality
+        function handleSearch() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const filtered = roomsData.filter(room => {
+                return (
+                    (room.nom || '').toLowerCase().includes(searchTerm) ||
+                    (room.equipements || '').toLowerCase().includes(searchTerm)
+                );
+            });
+            renderRoomsGrid(filtered);
+        }
+
+        // Open add modal
+        function openAddModal() {
+            currentRoomId = null;
+            const modal = new Modal('room-modal');
+
+            const content = `
+        <form id="room-form">
+          <div class="form-group">
+            <label class="form-label required">Nom de la salle</label>
+            <input type="text" class="form-input" id="room-nom" required placeholder="Ex: Salle A101">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Capacité</label>
+            <input type="number" class="form-input" id="room-capacite" required min="1" placeholder="Ex: 30">
+            <div class="form-help">Nombre maximum de personnes</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Équipements</label>
+            <textarea class="form-textarea" id="room-equipements" placeholder="Ex: Projecteur, Tableau blanc, Ordinateurs"></textarea>
+            <div class="form-help">Liste des équipements disponibles</div>
+          </div>
+        </form>
+      `;
+
+            const footer = `
+        <button class="btn btn-secondary" onclick="closeModal('room-modal')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveRoom()">Ajouter</button>
+      `;
+
+            modal.create('Ajouter une Salle', content, footer);
+            modal.open();
+        }
+
+        // Open edit modal
+        async function openEditModal(id) {
+            currentRoomId = id;
+            const room = roomsData.find(r => r.id === id);
+
+            if (!room) {
+                showToast('Salle non trouvée', 'danger');
+                return;
+            }
+
+            const modal = new Modal('room-modal');
+
+            const content = `
+        <form id="room-form">
+          <div class="form-group">
+            <label class="form-label required">Nom de la salle</label>
+            <input type="text" class="form-input" id="room-nom" required value="${room.nom || ''}">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Capacité</label>
+            <input type="number" class="form-input" id="room-capacite" required min="1" value="${room.capacite || ''}">
+            <div class="form-help">Nombre maximum de personnes</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Équipements</label>
+            <textarea class="form-textarea" id="room-equipements">${room.equipements || ''}</textarea>
+            <div class="form-help">Liste des équipements disponibles</div>
+          </div>
+        </form>
+      `;
+
+            const footer = `
+        <button class="btn btn-secondary" onclick="closeModal('room-modal')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveRoom()">Enregistrer</button>
+      `;
+
+            modal.create('Modifier la Salle', content, footer);
+            modal.open();
+        }
+
+        // Save room
+        async function saveRoom() {
+            if (!validateForm('room-form')) {
+                return;
+            }
+
+            const data = {
+                nom: document.getElementById('room-nom').value,
+                capacite: parseInt(document.getElementById('room-capacite').value),
+                equipements: document.getElementById('room-equipements').value
+            };
+
+            try {
+                showLoading();
+
+                if (currentRoomId) {
+                    await API.rooms.update(currentRoomId, data);
+                    showToast('Salle modifiée avec succès', 'success');
+                } else {
+                    await API.rooms.create(data);
+                    showToast('Salle ajoutée avec succès', 'success');
+                }
+
+                closeModal('room-modal');
+                await loadRooms();
+                hideLoading();
+            } catch (error) {
+                console.error('Error saving room:', error);
+                hideLoading();
+                showToast('Erreur lors de l\'enregistrement', 'danger');
+            }
+        }
+
+        // Delete room
+        async function deleteRoom(id) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer cette salle ?')) {
+                return;
+            }
+
+            try {
+                showLoading();
+                await API.rooms.delete(id);
+                showToast('Salle supprimée avec succès', 'success');
+                await loadRooms();
+                hideLoading();
+            } catch (error) {
+                console.error('Error deleting room:', error);
+                hideLoading();
+                showToast('Erreur lors de la suppression', 'danger');
+            }
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRooms();
+        });
+    </script>
+</body>
+
+</html>

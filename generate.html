@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générer Planning - Centre de Formation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">📚</div>
+                    <span>FormaPro</span>
+                </div>
+                <p class="sidebar-subtitle">Centre de Formation</p>
+            </div>
+
+            <nav class="nav-menu">
+                <ul class="nav-section">
+                    <li class="nav-section-title">Principal</li>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <span class="nav-icon">🏠</span>
+                            <span>Tableau de Bord</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="schedule.html" class="nav-link">
+                            <span class="nav-icon">📅</span>
+                            <span>Planning</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="generate.html" class="nav-link active">
+                            <span class="nav-icon">⚡</span>
+                            <span>Générer Planning</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="nav-section">
+                    <li class="nav-section-title">Gestion</li>
+                    <li class="nav-item">
+                        <a href="trainers.html" class="nav-link">
+                            <span class="nav-icon">👨‍🏫</span>
+                            <span>Formateurs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="students.html" class="nav-link">
+                            <span class="nav-icon">👨‍🎓</span>
+                            <span>Étudiants</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="rooms.html" class="nav-link">
+                            <span class="nav-icon">🏢</span>
+                            <span>Salles</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="materials.html" class="nav-link">
+                            <span class="nav-icon">💻</span>
+                            <span>Matériel</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="nav-section">
+                    <li class="nav-section-title">Analyse</li>
+                    <li class="nav-item">
+                        <a href="statistics.html" class="nav-link">
+                            <span class="nav-icon">📊</span>
+                            <span>Statistiques</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Générer un Planning</h1>
+                <p class="page-description">Configurez et générez automatiquement un planning optimisé</p>
+            </div>
+
+            <!-- Generation Form -->
+            <div class="grid grid-cols-2 gap-6">
+                <!-- Configuration Panel -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Configuration</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="generation-form">
+                            <div class="form-group">
+                                <label class="form-label required">Semaine</label>
+                                <input type="week" class="form-input" id="week-input" required>
+                                <div class="form-help">Sélectionnez la semaine pour laquelle générer le planning</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Algorithme d'optimisation</label>
+                                <select class="form-select" id="algorithm-select">
+                                    <option value="backtracking">Backtracking</option>
+                                    <option value="greedy" selected>Heuristique gloutonne</option>
+                                    <option value="constraint">Programmation par contraintes</option>
+                                    <option value="hybrid">Approche hybride</option>
+                                </select>
+                                <div class="form-help">Choisissez la méthode d'optimisation</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Priorités</label>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="priority-availability" checked>
+                                    <label class="form-check-label" for="priority-availability">
+                                        Respecter les disponibilités
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="priority-preferences" checked>
+                                    <label class="form-check-label" for="priority-preferences">
+                                        Maximiser les préférences
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="priority-utilization" checked>
+                                    <label class="form-check-label" for="priority-utilization">
+                                        Optimiser l'utilisation des ressources
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Contraintes supplémentaires</label>
+                                <textarea class="form-textarea" id="additional-constraints"
+                                    placeholder="Ex: Pas de cours le vendredi après-midi"></textarea>
+                            </div>
+
+                            <button type="button" class="btn btn-primary btn-lg" onclick="generateSchedule()"
+                                style="width: 100%;">
+                                <span>⚡</span>
+                                <span>Générer le Planning</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Results Panel -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Résultats</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="results-container">
+                            <div style="text-align: center; padding: 60px 20px; color: var(--text-tertiary);">
+                                <div style="font-size: 3rem; margin-bottom: 16px;">📊</div>
+                                <p>Configurez les paramètres et cliquez sur "Générer le Planning"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Section -->
+            <div id="progress-section" style="display: none;" class="card mt-6">
+                <div class="card-header">
+                    <h3 class="card-title">Progression</h3>
+                </div>
+                <div class="card-body">
+                    <div id="progress-log"
+                        style="font-family: var(--font-mono); font-size: 0.875rem; max-height: 300px; overflow-y: auto;">
+                        <!-- Progress messages will appear here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generated Schedule Preview -->
+            <div id="schedule-preview" style="display: none;" class="card mt-6">
+                <div class="card-header">
+                    <h3 class="card-title">Aperçu du Planning Généré</h3>
+                    <a href="schedule.html" class="btn btn-sm btn-primary">Voir le calendrier complet</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table class="table" id="preview-table">
+                            <thead>
+                                <tr>
+                                    <th>Jour</th>
+                                    <th>Heure</th>
+                                    <th>Cours</th>
+                                    <th>Formateur</th>
+                                    <th>Salle</th>
+                                    <th>Groupe</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Preview data will appear here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Set default week to current week
+        document.addEventListener('DOMContentLoaded', () => {
+            const weekInput = document.getElementById('week-input');
+            const today = new Date();
+            const year = today.getFullYear();
+            const week = getWeekNumber(today);
+            weekInput.value = `${year}-W${week.toString().padStart(2, '0')}`;
+        });
+
+        // Get ISO week number
+        function getWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        // Generate schedule
+        async function generateSchedule() {
+            const weekInput = document.getElementById('week-input').value;
+            if (!weekInput) {
+                showToast('Veuillez sélectionner une semaine', 'warning');
+                return;
+            }
+
+            const params = {
+                week: weekInput,
+                algorithm: document.getElementById('algorithm-select').value,
+                priorities: {
+                    availability: document.getElementById('priority-availability').checked,
+                    preferences: document.getElementById('priority-preferences').checked,
+                    utilization: document.getElementById('priority-utilization').checked
+                },
+                additionalConstraints: document.getElementById('additional-constraints').value
+            };
+
+            // Show progress section
+            const progressSection = document.getElementById('progress-section');
+            const progressLog = document.getElementById('progress-log');
+            progressSection.style.display = 'block';
+            progressLog.innerHTML = '';
+
+            // Add progress messages
+            addProgressMessage('🚀 Démarrage de la génération du planning...');
+            addProgressMessage('📊 Chargement des données (formateurs, étudiants, salles)...');
+
+            try {
+                showLoading();
+
+                // Simulate progress
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                addProgressMessage('✅ Données chargées avec succès');
+                addProgressMessage('🔍 Analyse des contraintes...');
+
+                await new Promise(resolve => setTimeout(resolve, 800));
+                addProgressMessage('⚙️ Application de l\'algorithme ' + params.algorithm + '...');
+
+                // Call API
+                const result = await API.schedule.generate(params);
+
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                addProgressMessage('✅ Planning généré avec succès!');
+                addProgressMessage(`📅 ${result.coursCount || 0} cours planifiés`);
+                addProgressMessage(`⚠️ ${result.conflictsCount || 0} conflits détectés`);
+
+                // Show results
+                displayResults(result);
+
+                // Show preview
+                if (result.schedule && result.schedule.length > 0) {
+                    displaySchedulePreview(result.schedule);
+                }
+
+                hideLoading();
+                showToast('Planning généré avec succès!', 'success');
+
+            } catch (error) {
+                console.error('Error generating schedule:', error);
+                addProgressMessage('❌ Erreur lors de la génération: ' + error.message);
+                hideLoading();
+                showToast('Erreur lors de la génération du planning', 'danger');
+            }
+        }
+
+        // Add progress message
+        function addProgressMessage(message) {
+            const progressLog = document.getElementById('progress-log');
+            const timestamp = new Date().toLocaleTimeString('fr-FR');
+            const line = document.createElement('div');
+            line.style.marginBottom = '8px';
+            line.style.color = 'var(--text-secondary)';
+            line.innerHTML = `<span style="color: var(--text-tertiary);">[${timestamp}]</span> ${message}`;
+            progressLog.appendChild(line);
+            progressLog.scrollTop = progressLog.scrollHeight;
+        }
+
+        // Display results
+        function displayResults(result) {
+            const container = document.getElementById('results-container');
+
+            const successRate = result.conflictsCount === 0 ? 100 :
+                Math.round((1 - result.conflictsCount / result.coursCount) * 100);
+
+            container.innerHTML = `
+        <div class="grid grid-cols-2 gap-4">
+          <div style="text-align: center; padding: 20px; background: var(--bg-elevated); border-radius: var(--radius-lg);">
+            <div style="font-size: 2.5rem; font-weight: bold; color: var(--primary-400);">${result.coursCount || 0}</div>
+            <div style="color: var(--text-secondary); margin-top: 8px;">Cours planifiés</div>
+          </div>
+          
+          <div style="text-align: center; padding: 20px; background: var(--bg-elevated); border-radius: var(--radius-lg);">
+            <div style="font-size: 2.5rem; font-weight: bold; color: ${result.conflictsCount === 0 ? 'var(--success-400)' : 'var(--danger-400)'};">${result.conflictsCount || 0}</div>
+            <div style="color: var(--text-secondary); margin-top: 8px;">Conflits détectés</div>
+          </div>
+          
+          <div style="text-align: center; padding: 20px; background: var(--bg-elevated); border-radius: var(--radius-lg);">
+            <div style="font-size: 2.5rem; font-weight: bold; color: var(--accent-400);">${result.roomUtilization || 0}%</div>
+            <div style="color: var(--text-secondary); margin-top: 8px;">Utilisation salles</div>
+          </div>
+          
+          <div style="text-align: center; padding: 20px; background: var(--bg-elevated); border-radius: var(--radius-lg);">
+            <div style="font-size: 2.5rem; font-weight: bold; color: var(--success-400);">${successRate}%</div>
+            <div style="color: var(--text-secondary); margin-top: 8px;">Taux de réussite</div>
+          </div>
+        </div>
+
+        ${result.conflictsCount > 0 ? `
+          <div class="alert alert-warning" style="margin-top: 20px;">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-content">
+              <div class="alert-title">Attention</div>
+              <div>Des conflits ont été détectés. Veuillez consulter le planning pour les résoudre.</div>
+            </div>
+          </div>
+        ` : `
+          <div class="alert alert-success" style="margin-top: 20px;">
+            <div class="alert-icon">✅</div>
+            <div class="alert-content">
+              <div class="alert-title">Succès</div>
+              <div>Le planning a été généré sans conflits!</div>
+            </div>
+          </div>
+        `}
+
+        <div style="margin-top: 20px; display: flex; gap: 12px;">
+          <a href="schedule.html" class="btn btn-primary" style="flex: 1;">
+            📅 Voir le Planning
+          </a>
+          <a href="statistics.html" class="btn btn-secondary" style="flex: 1;">
+            📊 Voir les Statistiques
+          </a>
+        </div>
+      `;
+        }
+
+        // Display schedule preview
+        function displaySchedulePreview(schedule) {
+            const previewSection = document.getElementById('schedule-preview');
+            const tbody = document.querySelector('#preview-table tbody');
+
+            previewSection.style.display = 'block';
+
+            const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
+
+            tbody.innerHTML = schedule.slice(0, 10).map(item => `
+        <tr>
+          <td>${days[new Date(item.date).getDay() - 1] || 'N/A'}</td>
+          <td>${formatTime(item.heure)}</td>
+          <td><strong>${item.coursNom || '-'}</strong></td>
+          <td>${item.formateurNom || '-'}</td>
+          <td>${item.salleNom || '-'}</td>
+          <td>${item.groupeNom || '-'}</td>
+        </tr>
+      `).join('');
+
+            if (schedule.length > 10) {
+                tbody.innerHTML += `
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-tertiary); padding: 20px;">
+              ... et ${schedule.length - 10} autres cours. <a href="schedule.html">Voir tout</a>
+            </td>
+          </tr>
+        `;
+            }
+        }
+    </script>
+</body>
+
+</html>

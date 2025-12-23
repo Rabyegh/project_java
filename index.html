@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de Bord - Gestion Centre de Formation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="sidebar-logo-icon">📚</div>
+          <span>FormaPro</span>
+        </div>
+        <p class="sidebar-subtitle">Centre de Formation</p>
+      </div>
+
+      <nav class="nav-menu">
+        <ul class="nav-section">
+          <li class="nav-section-title">Principal</li>
+          <li class="nav-item">
+            <a href="index.html" class="nav-link active">
+              <span class="nav-icon">🏠</span>
+              <span>Tableau de Bord</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="schedule.html" class="nav-link">
+              <span class="nav-icon">📅</span>
+              <span>Planning</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="generate.html" class="nav-link">
+              <span class="nav-icon">⚡</span>
+              <span>Générer Planning</span>
+            </a>
+          </li>
+        </ul>
+
+        <ul class="nav-section">
+          <li class="nav-section-title">Gestion</li>
+          <li class="nav-item">
+            <a href="trainers.html" class="nav-link">
+              <span class="nav-icon">👨‍🏫</span>
+              <span>Formateurs</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="students.html" class="nav-link">
+              <span class="nav-icon">👨‍🎓</span>
+              <span>Étudiants</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="rooms.html" class="nav-link">
+              <span class="nav-icon">🏢</span>
+              <span>Salles</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="materials.html" class="nav-link">
+              <span class="nav-icon">💻</span>
+              <span>Matériel</span>
+            </a>
+          </li>
+        </ul>
+
+        <ul class="nav-section">
+          <li class="nav-section-title">Analyse</li>
+          <li class="nav-item">
+            <a href="statistics.html" class="nav-link">
+              <span class="nav-icon">📊</span>
+              <span>Statistiques</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="page-header">
+        <h1 class="page-title">Tableau de Bord</h1>
+        <p class="page-description">Vue d'ensemble de votre centre de formation</p>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div class="grid grid-cols-4 mb-8">
+        <div class="stat-card fade-in">
+          <div class="stat-label">Formateurs</div>
+          <div class="stat-value" id="stat-trainers">-</div>
+          <div class="stat-change positive">
+            <span>↑</span>
+            <span>Actifs</span>
+          </div>
+        </div>
+
+        <div class="stat-card fade-in" style="animation-delay: 0.1s;">
+          <div class="stat-label">Étudiants</div>
+          <div class="stat-value" id="stat-students">-</div>
+          <div class="stat-change positive">
+            <span>↑</span>
+            <span>Inscrits</span>
+          </div>
+        </div>
+
+        <div class="stat-card fade-in" style="animation-delay: 0.2s;">
+          <div class="stat-label">Salles</div>
+          <div class="stat-value" id="stat-rooms">-</div>
+          <div class="stat-change">
+            <span>📍</span>
+            <span>Disponibles</span>
+          </div>
+        </div>
+
+        <div class="stat-card fade-in" style="animation-delay: 0.3s;">
+          <div class="stat-label">Taux d'utilisation</div>
+          <div class="stat-value" id="stat-usage">-</div>
+          <div class="stat-change positive">
+            <span>↑</span>
+            <span id="stat-usage-change">-</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card mb-8 fade-in" style="animation-delay: 0.4s;">
+        <div class="card-header">
+          <h2 class="card-title">Actions Rapides</h2>
+        </div>
+        <div class="card-body">
+          <div class="grid grid-cols-4 gap-4">
+            <a href="generate.html" class="btn btn-primary btn-lg">
+              <span>⚡</span>
+              <span>Générer Planning</span>
+            </a>
+            <a href="trainers.html" class="btn btn-secondary btn-lg">
+              <span>➕</span>
+              <span>Ajouter Formateur</span>
+            </a>
+            <a href="students.html" class="btn btn-secondary btn-lg">
+              <span>➕</span>
+              <span>Ajouter Étudiant</span>
+            </a>
+            <a href="statistics.html" class="btn btn-secondary btn-lg">
+              <span>📊</span>
+              <span>Voir Statistiques</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity & Planning Overview -->
+      <div class="grid grid-cols-2 gap-6">
+        <!-- Planning Status -->
+        <div class="card fade-in" style="animation-delay: 0.5s;">
+          <div class="card-header">
+            <h2 class="card-title">État du Planning</h2>
+            <a href="schedule.html" class="btn btn-sm btn-secondary">Voir tout</a>
+          </div>
+          <div class="card-body">
+            <div id="planning-status">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-secondary">Planning de la semaine</span>
+                <span class="badge badge-success" id="planning-week-status">Généré</span>
+              </div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-secondary">Cours planifiés</span>
+                <span class="text-primary font-semibold" id="planned-courses">-</span>
+              </div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-secondary">Conflits détectés</span>
+                <span class="badge badge-danger" id="conflicts-count">0</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-secondary">Dernière génération</span>
+                <span class="text-tertiary" id="last-generation">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resource Utilization -->
+        <div class="card fade-in" style="animation-delay: 0.6s;">
+          <div class="card-header">
+            <h2 class="card-title">Utilisation des Ressources</h2>
+          </div>
+          <div class="card-body">
+            <div class="mb-5">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-secondary">Salles</span>
+                <span class="text-primary font-semibold" id="room-usage-percent">-</span>
+              </div>
+              <div style="background: var(--bg-elevated); height: 8px; border-radius: 999px; overflow: hidden;">
+                <div id="room-usage-bar" style="background: linear-gradient(90deg, var(--primary-500), var(--accent-500)); height: 100%; width: 0%; transition: width 1s ease-out;"></div>
+              </div>
+            </div>
+
+            <div class="mb-5">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-secondary">Formateurs</span>
+                <span class="text-primary font-semibold" id="trainer-usage-percent">-</span>
+              </div>
+              <div style="background: var(--bg-elevated); height: 8px; border-radius: 999px; overflow: hidden;">
+                <div id="trainer-usage-bar" style="background: linear-gradient(90deg, var(--success-500), var(--success-600)); height: 100%; width: 0%; transition: width 1s ease-out;"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-secondary">Matériel</span>
+                <span class="text-primary font-semibold" id="material-usage-percent">-</span>
+              </div>
+              <div style="background: var(--bg-elevated); height: 8px; border-radius: 999px; overflow: hidden;">
+                <div id="material-usage-bar" style="background: linear-gradient(90deg, var(--warning-500), var(--warning-600)); height: 100%; width: 0%; transition: width 1s ease-out;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Sessions -->
+      <div class="card mt-8 fade-in" style="animation-delay: 0.7s;">
+        <div class="card-header">
+          <h2 class="card-title">Prochaines Sessions</h2>
+          <a href="schedule.html" class="btn btn-sm btn-secondary">Voir calendrier</a>
+        </div>
+        <div class="card-body">
+          <div class="table-container">
+            <table class="table" id="upcoming-sessions">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Heure</th>
+                  <th>Cours</th>
+                  <th>Formateur</th>
+                  <th>Salle</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="6" style="text-align: center; color: var(--text-tertiary);">
+                    Chargement des données...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    // Dashboard specific functionality
+    async function loadDashboardData() {
+      try {
+        showLoading();
+
+        // Load statistics
+        const [trainers, students, rooms, materials, stats] = await Promise.all([
+          API.trainers.getAll().catch(() => []),
+          API.students.getAll().catch(() => []),
+          API.rooms.getAll().catch(() => []),
+          API.materials.getAll().catch(() => []),
+          API.stats.getUsage().catch(() => ({}))
+        ]);
+
+        // Update stat cards
+        document.getElementById('stat-trainers').textContent = trainers.length || 0;
+        document.getElementById('stat-students').textContent = students.length || 0;
+        document.getElementById('stat-rooms').textContent = rooms.length || 0;
+
+        // Update usage statistics
+        if (stats.roomUsage !== undefined) {
+          const roomUsage = Math.round(stats.roomUsage);
+          document.getElementById('stat-usage').textContent = `${roomUsage}%`;
+          document.getElementById('stat-usage-change').textContent = `${roomUsage}% cette semaine`;
+          
+          // Update progress bars
+          setTimeout(() => {
+            document.getElementById('room-usage-bar').style.width = `${roomUsage}%`;
+            document.getElementById('room-usage-percent').textContent = `${roomUsage}%`;
+          }, 100);
+        } else {
+          document.getElementById('stat-usage').textContent = '0%';
+          document.getElementById('stat-usage-change').textContent = 'Aucune donnée';
+        }
+
+        if (stats.trainerUsage !== undefined) {
+          const trainerUsage = Math.round(stats.trainerUsage);
+          setTimeout(() => {
+            document.getElementById('trainer-usage-bar').style.width = `${trainerUsage}%`;
+            document.getElementById('trainer-usage-percent').textContent = `${trainerUsage}%`;
+          }, 200);
+        }
+
+        if (stats.materialUsage !== undefined) {
+          const materialUsage = Math.round(stats.materialUsage);
+          setTimeout(() => {
+            document.getElementById('material-usage-bar').style.width = `${materialUsage}%`;
+            document.getElementById('material-usage-percent').textContent = `${materialUsage}%`;
+          }, 300);
+        }
+
+        // Load planning status
+        try {
+          const planning = await API.schedule.getAll();
+          document.getElementById('planned-courses').textContent = planning.length || 0;
+          
+          const conflicts = await API.stats.getConflicts();
+          document.getElementById('conflicts-count').textContent = conflicts.count || 0;
+          
+          if (planning.length > 0) {
+            const lastGeneration = new Date(planning[0].createdAt || Date.now());
+            document.getElementById('last-generation').textContent = formatDate(lastGeneration);
+          }
+        } catch (error) {
+          console.log('Planning data not available');
+        }
+
+        // Load upcoming sessions
+        loadUpcomingSessions();
+
+        hideLoading();
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        hideLoading();
+        
+        // Set default values
+        document.getElementById('stat-trainers').textContent = '0';
+        document.getElementById('stat-students').textContent = '0';
+        document.getElementById('stat-rooms').textContent = '0';
+        document.getElementById('stat-usage').textContent = '0%';
+        document.getElementById('stat-usage-change').textContent = 'Aucune donnée';
+      }
+    }
+
+    async function loadUpcomingSessions() {
+      try {
+        const planning = await API.schedule.getAll();
+        const tbody = document.querySelector('#upcoming-sessions tbody');
+        
+        if (!planning || planning.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-tertiary);">
+                Aucune session planifiée. <a href="generate.html">Générer un planning</a>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        // Sort by date and take first 5
+        const upcoming = planning
+          .sort((a, b) => new Date(a.date) - new Date(b.date))
+          .slice(0, 5);
+
+        tbody.innerHTML = upcoming.map(session => `
+          <tr>
+            <td>${formatDate(session.date)}</td>
+            <td>${formatTime(session.heure)}</td>
+            <td>${session.coursNom || '-'}</td>
+            <td>${session.formateurNom || '-'}</td>
+            <td>${session.salleNom || '-'}</td>
+            <td><span class="badge badge-success">Planifié</span></td>
+          </tr>
+        `).join('');
+      } catch (error) {
+        console.error('Error loading upcoming sessions:', error);
+        const tbody = document.querySelector('#upcoming-sessions tbody');
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-tertiary);">
+              Impossible de charger les sessions
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    // Load data when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDashboardData();
+    });
+  </script>
+</body>
+</html>

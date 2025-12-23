@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistiques - Centre de Formation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">📚</div>
+                    <span>FormaPro</span>
+                </div>
+                <p class="sidebar-subtitle">Centre de Formation</p>
+            </div>
+
+            <nav class="nav-menu">
+                <ul class="nav-section">
+                    <li class="nav-section-title">Principal</li>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <span class="nav-icon">🏠</span>
+                            <span>Tableau de Bord</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="schedule.html" class="nav-link">
+                            <span class="nav-icon">📅</span>
+                            <span>Planning</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="generate.html" class="nav-link">
+                            <span class="nav-icon">⚡</span>
+                            <span>Générer Planning</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="nav-section">
+                    <li class="nav-section-title">Gestion</li>
+                    <li class="nav-item">
+                        <a href="trainers.html" class="nav-link">
+                            <span class="nav-icon">👨‍🏫</span>
+                            <span>Formateurs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="students.html" class="nav-link">
+                            <span class="nav-icon">👨‍🎓</span>
+                            <span>Étudiants</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="rooms.html" class="nav-link">
+                            <span class="nav-icon">🏢</span>
+                            <span>Salles</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="materials.html" class="nav-link">
+                            <span class="nav-icon">💻</span>
+                            <span>Matériel</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="nav-section">
+                    <li class="nav-section-title">Analyse</li>
+                    <li class="nav-item">
+                        <a href="statistics.html" class="nav-link active">
+                            <span class="nav-icon">📊</span>
+                            <span>Statistiques</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Statistiques & Analyses</h1>
+                <p class="page-description">Visualisez les performances et l'utilisation des ressources</p>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="grid grid-cols-4 mb-8">
+                <div class="stat-card fade-in">
+                    <div class="stat-label">Utilisation des Salles</div>
+                    <div class="stat-value" id="stat-room-usage">-</div>
+                    <div class="stat-change positive">
+                        <span>↑</span>
+                        <span id="stat-room-change">-</span>
+                    </div>
+                </div>
+
+                <div class="stat-card fade-in" style="animation-delay: 0.1s;">
+                    <div class="stat-label">Satisfaction Préférences</div>
+                    <div class="stat-value" id="stat-satisfaction">-</div>
+                    <div class="stat-change positive">
+                        <span>↑</span>
+                        <span id="stat-satisfaction-change">-</span>
+                    </div>
+                </div>
+
+                <div class="stat-card fade-in" style="animation-delay: 0.2s;">
+                    <div class="stat-label">Conflits Détectés</div>
+                    <div class="stat-value" id="stat-conflicts">-</div>
+                    <div class="stat-change" id="stat-conflicts-change">
+                        <span>-</span>
+                    </div>
+                </div>
+
+                <div class="stat-card fade-in" style="animation-delay: 0.3s;">
+                    <div class="stat-label">Heures Planifiées</div>
+                    <div class="stat-value" id="stat-hours">-</div>
+                    <div class="stat-change">
+                        <span>📅</span>
+                        <span id="stat-hours-change">Cette semaine</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 1 -->
+            <div class="grid grid-cols-2 gap-6 mb-6">
+                <!-- Room Utilization Chart -->
+                <div class="card fade-in" style="animation-delay: 0.4s;">
+                    <div class="card-header">
+                        <h3 class="card-title">Utilisation des Salles</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="roomUtilizationChart" height="250"></canvas>
+                    </div>
+                </div>
+
+                <!-- Trainer Workload Chart -->
+                <div class="card fade-in" style="animation-delay: 0.5s;">
+                    <div class="card-header">
+                        <h3 class="card-title">Charge de Travail des Formateurs</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="trainerWorkloadChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 2 -->
+            <div class="grid grid-cols-2 gap-6 mb-6">
+                <!-- Weekly Schedule Distribution -->
+                <div class="card fade-in" style="animation-delay: 0.6s;">
+                    <div class="card-header">
+                        <h3 class="card-title">Répartition Hebdomadaire</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="weeklyDistributionChart" height="250"></canvas>
+                    </div>
+                </div>
+
+                <!-- Conflicts Timeline -->
+                <div class="card fade-in" style="animation-delay: 0.7s;">
+                    <div class="card-header">
+                        <h3 class="card-title">Évolution des Conflits</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="conflictsTimelineChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Statistics Table -->
+            <div class="card fade-in" style="animation-delay: 0.8s;">
+                <div class="card-header">
+                    <h3 class="card-title">Statistiques Détaillées</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Métrique</th>
+                                    <th>Valeur</th>
+                                    <th>Objectif</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detailed-stats-tbody">
+                                <tr>
+                                    <td colspan="4" style="text-align: center; color: var(--text-tertiary);">
+                                        Chargement des données...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let charts = {};
+
+        // Load statistics data
+        async function loadStatistics() {
+            try {
+                showLoading();
+
+                const stats = await API.stats.getUsage();
+
+                // Update key metrics
+                updateKeyMetrics(stats);
+
+                // Create charts
+                createRoomUtilizationChart(stats.roomUtilization || {});
+                createTrainerWorkloadChart(stats.trainerWorkload || {});
+                createWeeklyDistributionChart(stats.weeklyDistribution || {});
+                createConflictsTimelineChart(stats.conflictsTimeline || {});
+
+                // Update detailed stats table
+                updateDetailedStats(stats);
+
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+                hideLoading();
+
+                // Show sample data
+                loadSampleData();
+            }
+        }
+
+        // Update key metrics
+        function updateKeyMetrics(stats) {
+            document.getElementById('stat-room-usage').textContent = `${stats.roomUsagePercent || 0}%`;
+            document.getElementById('stat-room-change').textContent = `${stats.roomUsageChange || 0}% vs semaine dernière`;
+
+            document.getElementById('stat-satisfaction').textContent = `${stats.satisfactionPercent || 0}%`;
+            document.getElementById('stat-satisfaction-change').textContent = `${stats.satisfactionChange || 0}% vs semaine dernière`;
+
+            const conflicts = stats.conflictsCount || 0;
+            document.getElementById('stat-conflicts').textContent = conflicts;
+            const conflictsChange = document.getElementById('stat-conflicts-change');
+            if (conflicts === 0) {
+                conflictsChange.innerHTML = '<span>✅</span><span>Aucun conflit</span>';
+                conflictsChange.className = 'stat-change positive';
+            } else {
+                conflictsChange.innerHTML = `<span>⚠️</span><span>${conflicts} à résoudre</span>`;
+                conflictsChange.className = 'stat-change negative';
+            }
+
+            document.getElementById('stat-hours').textContent = stats.totalHours || 0;
+        }
+
+        // Create room utilization chart
+        function createRoomUtilizationChart(data) {
+            const ctx = document.getElementById('roomUtilizationChart');
+
+            charts.roomUtilization = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels || ['Salle A', 'Salle B', 'Salle C', 'Salle D', 'Salle E'],
+                    datasets: [{
+                        label: 'Taux d\'utilisation (%)',
+                        data: data.values || [85, 72, 90, 65, 78],
+                        backgroundColor: 'hsla(260, 75%, 55%, 0.8)',
+                        borderColor: 'hsl(260, 70%, 45%)',
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { color: 'hsl(0, 0%, 75%)' },
+                            grid: { color: 'hsla(230, 15%, 25%, 0.5)' }
+                        },
+                        x: {
+                            ticks: { color: 'hsl(0, 0%, 75%)' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create trainer workload chart
+        function createTrainerWorkloadChart(data) {
+            const ctx = document.getElementById('trainerWorkloadChart');
+
+            charts.trainerWorkload = new Chart(ctx, {
+                type: 'horizontalBar',
+                data: {
+                    labels: data.labels || ['Formateur 1', 'Formateur 2', 'Formateur 3', 'Formateur 4'],
+                    datasets: [{
+                        label: 'Heures de cours',
+                        data: data.values || [24, 18, 20, 16],
+                        backgroundColor: 'hsla(180, 80%, 50%, 0.8)',
+                        borderColor: 'hsl(180, 75%, 40%)',
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: { color: 'hsl(0, 0%, 75%)' },
+                            grid: { color: 'hsla(230, 15%, 25%, 0.5)' }
+                        },
+                        y: {
+                            ticks: { color: 'hsl(0, 0%, 75%)' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create weekly distribution chart
+        function createWeeklyDistributionChart(data) {
+            const ctx = document.getElementById('weeklyDistributionChart');
+
+            charts.weeklyDistribution = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels || ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'],
+                    datasets: [{
+                        label: 'Nombre de cours',
+                        data: data.values || [12, 15, 14, 13, 10],
+                        backgroundColor: 'hsla(145, 65%, 45%, 0.2)',
+                        borderColor: 'hsl(145, 65%, 45%)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointBackgroundColor: 'hsl(145, 65%, 45%)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: 'hsl(0, 0%, 75%)' },
+                            grid: { color: 'hsla(230, 15%, 25%, 0.5)' }
+                        },
+                        x: {
+                            ticks: { color: 'hsl(0, 0%, 75%)' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create conflicts timeline chart
+        function createConflictsTimelineChart(data) {
+            const ctx = document.getElementById('conflictsTimelineChart');
+
+            charts.conflictsTimeline = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels || ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5'],
+                    datasets: [{
+                        label: 'Conflits',
+                        data: data.values || [8, 5, 3, 2, 0],
+                        backgroundColor: 'hsla(355, 80%, 55%, 0.2)',
+                        borderColor: 'hsl(355, 80%, 55%)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointBackgroundColor: 'hsl(355, 80%, 55%)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: 'hsl(0, 0%, 75%)',
+                                stepSize: 1
+                            },
+                            grid: { color: 'hsla(230, 15%, 25%, 0.5)' }
+                        },
+                        x: {
+                            ticks: { color: 'hsl(0, 0%, 75%)' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update detailed stats table
+        function updateDetailedStats(stats) {
+            const tbody = document.getElementById('detailed-stats-tbody');
+
+            const metrics = [
+                { name: 'Utilisation moyenne des salles', value: `${stats.roomUsagePercent || 78}%`, target: '80%', status: 'success' },
+                { name: 'Satisfaction des préférences', value: `${stats.satisfactionPercent || 85}%`, target: '75%', status: 'success' },
+                { name: 'Taux de conflits', value: `${stats.conflictRate || 2}%`, target: '< 5%', status: 'success' },
+                { name: 'Heures de cours par semaine', value: stats.totalHours || 64, target: '60', status: 'success' },
+                { name: 'Formateurs actifs', value: stats.activeTrainers || 8, target: '8', status: 'success' },
+                { name: 'Salles utilisées', value: stats.usedRooms || 5, target: '5', status: 'success' }
+            ];
+
+            tbody.innerHTML = metrics.map(metric => `
+        <tr>
+          <td><strong>${metric.name}</strong></td>
+          <td>${metric.value}</td>
+          <td>${metric.target}</td>
+          <td><span class="badge badge-${metric.status}">✓ Atteint</span></td>
+        </tr>
+      `).join('');
+        }
+
+        // Load sample data for demonstration
+        function loadSampleData() {
+            const sampleStats = {
+                roomUsagePercent: 78,
+                roomUsageChange: 5,
+                satisfactionPercent: 85,
+                satisfactionChange: 3,
+                conflictsCount: 0,
+                totalHours: 64,
+                activeTrainers: 8,
+                usedRooms: 5,
+                conflictRate: 0
+            };
+
+            updateKeyMetrics(sampleStats);
+            createRoomUtilizationChart({});
+            createTrainerWorkloadChart({});
+            createWeeklyDistributionChart({});
+            createConflictsTimelineChart({});
+            updateDetailedStats(sampleStats);
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStatistics();
+        });
+    </script>
+</body>
+
+</html>

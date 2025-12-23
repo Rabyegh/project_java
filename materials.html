@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion du Matériel - Centre de Formation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">📚</div>
+                    <span>FormaPro</span>
+                </div>
+                <p class="sidebar-subtitle">Centre de Formation</p>
+            </div>
+
+            <nav class="nav-menu">
+                <ul class="nav-section">
+                    <li class="nav-section-title">Principal</li>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <span class="nav-icon">🏠</span>
+                            <span>Tableau de Bord</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="schedule.html" class="nav-link">
+                            <span class="nav-icon">📅</span>
+                            <span>Planning</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="generate.html" class="nav-link">
+                            <span class="nav-icon">⚡</span>
+                            <span>Générer Planning</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="nav-section">
+                    <li class="nav-section-title">Gestion</li>
+                    <li class="nav-item">
+                        <a href="trainers.html" class="nav-link">
+                            <span class="nav-icon">👨‍🏫</span>
+                            <span>Formateurs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="students.html" class="nav-link">
+                            <span class="nav-icon">👨‍🎓</span>
+                            <span>Étudiants</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="rooms.html" class="nav-link">
+                            <span class="nav-icon">🏢</span>
+                            <span>Salles</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="materials.html" class="nav-link active">
+                            <span class="nav-icon">💻</span>
+                            <span>Matériel</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="nav-section">
+                    <li class="nav-section-title">Analyse</li>
+                    <li class="nav-item">
+                        <a href="statistics.html" class="nav-link">
+                            <span class="nav-icon">📊</span>
+                            <span>Statistiques</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Gestion du Matériel</h1>
+                <p class="page-description">Gérez l'inventaire du matériel et équipements</p>
+            </div>
+
+            <!-- Actions Bar -->
+            <div class="flex items-center justify-between mb-6">
+                <div class="form-group" style="margin: 0; flex: 1; max-width: 400px;">
+                    <input type="text" class="form-input" id="search-input" placeholder="Rechercher du matériel..."
+                        onkeyup="handleSearch()">
+                </div>
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <span>➕</span>
+                    <span>Ajouter du Matériel</span>
+                </button>
+            </div>
+
+            <!-- Materials Table -->
+            <div class="card">
+                <div class="table-container">
+                    <table class="table" id="materials-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Quantité</th>
+                                <th>État</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-tertiary);">
+                                    Chargement des données...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let materialsData = [];
+        let currentMaterialId = null;
+
+        // Load materials data
+        async function loadMaterials() {
+            try {
+                showLoading();
+                materialsData = await API.materials.getAll();
+                renderMaterialsTable(materialsData);
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading materials:', error);
+                hideLoading();
+                showToast('Erreur lors du chargement du matériel', 'danger');
+
+                const tbody = document.querySelector('#materials-table tbody');
+                tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-tertiary); padding: 40px;">
+              Aucun matériel trouvé. <a href="#" onclick="openAddModal(); return false;">Ajouter le premier matériel</a>
+            </td>
+          </tr>
+        `;
+            }
+        }
+
+        // Render materials table
+        function renderMaterialsTable(data) {
+            const tbody = document.querySelector('#materials-table tbody');
+
+            if (data.length === 0) {
+                tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-tertiary); padding: 40px;">
+              Aucun matériel trouvé. <a href="#" onclick="openAddModal(); return false;">Ajouter le premier matériel</a>
+            </td>
+          </tr>
+        `;
+                return;
+            }
+
+            tbody.innerHTML = data.map(material => {
+                const quantityBadge = material.quantite > 10 ? 'badge-success' :
+                    material.quantite > 0 ? 'badge-warning' : 'badge-danger';
+                const statusText = material.quantite > 10 ? 'En stock' :
+                    material.quantite > 0 ? 'Stock faible' : 'Rupture';
+
+                return `
+          <tr>
+            <td>${material.id}</td>
+            <td><strong>${material.type || '-'}</strong></td>
+            <td>${material.description || '-'}</td>
+            <td><span class="badge ${quantityBadge}">${material.quantite || 0}</span></td>
+            <td><span class="badge ${quantityBadge}">${statusText}</span></td>
+            <td>
+              <div class="flex gap-2">
+                <button class="btn btn-sm btn-secondary" onclick="openEditModal(${material.id})">
+                  ✏️ Modifier
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="deleteMaterial(${material.id})">
+                  🗑️ Supprimer
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+            }).join('');
+        }
+
+        // Search functionality
+        function handleSearch() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const filtered = materialsData.filter(material => {
+                return (
+                    (material.type || '').toLowerCase().includes(searchTerm) ||
+                    (material.description || '').toLowerCase().includes(searchTerm)
+                );
+            });
+            renderMaterialsTable(filtered);
+        }
+
+        // Open add modal
+        function openAddModal() {
+            currentMaterialId = null;
+            const modal = new Modal('material-modal');
+
+            const content = `
+        <form id="material-form">
+          <div class="form-group">
+            <label class="form-label required">Type de matériel</label>
+            <input type="text" class="form-input" id="material-type" required placeholder="Ex: Ordinateur portable">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea" id="material-description" placeholder="Ex: Dell Latitude 5420, 16GB RAM, 512GB SSD"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Quantité</label>
+            <input type="number" class="form-input" id="material-quantite" required min="0" value="1">
+          </div>
+        </form>
+      `;
+
+            const footer = `
+        <button class="btn btn-secondary" onclick="closeModal('material-modal')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveMaterial()">Ajouter</button>
+      `;
+
+            modal.create('Ajouter du Matériel', content, footer);
+            modal.open();
+        }
+
+        // Open edit modal
+        async function openEditModal(id) {
+            currentMaterialId = id;
+            const material = materialsData.find(m => m.id === id);
+
+            if (!material) {
+                showToast('Matériel non trouvé', 'danger');
+                return;
+            }
+
+            const modal = new Modal('material-modal');
+
+            const content = `
+        <form id="material-form">
+          <div class="form-group">
+            <label class="form-label required">Type de matériel</label>
+            <input type="text" class="form-input" id="material-type" required value="${material.type || ''}">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea" id="material-description">${material.description || ''}</textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Quantité</label>
+            <input type="number" class="form-input" id="material-quantite" required min="0" value="${material.quantite || 0}">
+          </div>
+        </form>
+      `;
+
+            const footer = `
+        <button class="btn btn-secondary" onclick="closeModal('material-modal')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveMaterial()">Enregistrer</button>
+      `;
+
+            modal.create('Modifier le Matériel', content, footer);
+            modal.open();
+        }
+
+        // Save material
+        async function saveMaterial() {
+            if (!validateForm('material-form')) {
+                return;
+            }
+
+            const data = {
+                type: document.getElementById('material-type').value,
+                description: document.getElementById('material-description').value,
+                quantite: parseInt(document.getElementById('material-quantite').value)
+            };
+
+            try {
+                showLoading();
+
+                if (currentMaterialId) {
+                    await API.materials.update(currentMaterialId, data);
+                    showToast('Matériel modifié avec succès', 'success');
+                } else {
+                    await API.materials.create(data);
+                    showToast('Matériel ajouté avec succès', 'success');
+                }
+
+                closeModal('material-modal');
+                await loadMaterials();
+                hideLoading();
+            } catch (error) {
+                console.error('Error saving material:', error);
+                hideLoading();
+                showToast('Erreur lors de l\'enregistrement', 'danger');
+            }
+        }
+
+        // Delete material
+        async function deleteMaterial(id) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce matériel ?')) {
+                return;
+            }
+
+            try {
+                showLoading();
+                await API.materials.delete(id);
+                showToast('Matériel supprimé avec succès', 'success');
+                await loadMaterials();
+                hideLoading();
+            } catch (error) {
+                console.error('Error deleting material:', error);
+                hideLoading();
+                showToast('Erreur lors de la suppression', 'danger');
+            }
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMaterials();
+        });
+    </script>
+</body>
+
+</html>

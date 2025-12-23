@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning Hebdomadaire - Centre de Formation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">📚</div>
+                    <span>FormaPro</span>
+                </div>
+                <p class="sidebar-subtitle">Centre de Formation</p>
+            </div>
+
+            <nav class="nav-menu">
+                <ul class="nav-section">
+                    <li class="nav-section-title">Principal</li>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <span class="nav-icon">🏠</span>
+                            <span>Tableau de Bord</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="schedule.html" class="nav-link active">
+                            <span class="nav-icon">📅</span>
+                            <span>Planning</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="generate.html" class="nav-link">
+                            <span class="nav-icon">⚡</span>
+                            <span>Générer Planning</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="nav-section">
+                    <li class="nav-section-title">Gestion</li>
+                    <li class="nav-item">
+                        <a href="trainers.html" class="nav-link">
+                            <span class="nav-icon">👨‍🏫</span>
+                            <span>Formateurs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="students.html" class="nav-link">
+                            <span class="nav-icon">👨‍🎓</span>
+                            <span>Étudiants</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="rooms.html" class="nav-link">
+                            <span class="nav-icon">🏢</span>
+                            <span>Salles</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="materials.html" class="nav-link">
+                            <span class="nav-icon">💻</span>
+                            <span>Matériel</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="nav-section">
+                    <li class="nav-section-title">Analyse</li>
+                    <li class="nav-item">
+                        <a href="statistics.html" class="nav-link">
+                            <span class="nav-icon">📊</span>
+                            <span>Statistiques</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Planning Hebdomadaire</h1>
+                <p class="page-description">Visualisez et gérez le planning des cours</p>
+            </div>
+
+            <!-- Calendar Controls -->
+            <div class="card mb-6">
+                <div class="card-body">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <button class="btn btn-secondary" onclick="calendar.prev()">
+                                ← Précédent
+                            </button>
+                            <button class="btn btn-secondary" onclick="calendar.today()">
+                                Aujourd'hui
+                            </button>
+                            <button class="btn btn-secondary" onclick="calendar.next()">
+                                Suivant →
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <a href="generate.html" class="btn btn-primary">
+                                <span>⚡</span>
+                                <span>Générer Planning</span>
+                            </a>
+                            <button class="btn btn-secondary" onclick="exportSchedule()">
+                                <span>📥</span>
+                                <span>Exporter</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conflicts Alert -->
+            <div id="conflicts-alert" style="display: none;" class="alert alert-danger mb-6">
+                <div class="alert-icon">⚠️</div>
+                <div class="alert-content">
+                    <div class="alert-title">Conflits Détectés</div>
+                    <div id="conflicts-message"></div>
+                </div>
+            </div>
+
+            <!-- Calendar -->
+            <div class="card">
+                <div id="calendar"></div>
+            </div>
+
+            <!-- Legend -->
+            <div class="card mt-6">
+                <div class="card-header">
+                    <h3 class="card-title">Légende</h3>
+                </div>
+                <div class="card-body">
+                    <div class="flex gap-6">
+                        <div class="flex items-center gap-2">
+                            <div style="width: 20px; height: 20px; background: var(--primary-500); border-radius: 4px;">
+                            </div>
+                            <span>Cours planifié</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div style="width: 20px; height: 20px; background: var(--danger-500); border-radius: 4px;">
+                            </div>
+                            <span>Conflit détecté</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div style="width: 20px; height: 20px; background: var(--success-500); border-radius: 4px;">
+                            </div>
+                            <span>Confirmé</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let calendar;
+        let scheduleData = [];
+
+        // Initialize calendar
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'timeGridWeek',
+                locale: 'fr',
+                headerToolbar: false,
+                slotMinTime: '08:00:00',
+                slotMaxTime: '20:00:00',
+                allDaySlot: false,
+                height: 'auto',
+                expandRows: true,
+                slotDuration: '00:30:00',
+                slotLabelInterval: '01:00',
+                weekends: false,
+                nowIndicator: true,
+                editable: false,
+                selectable: true,
+                selectMirror: true,
+                dayMaxEvents: true,
+
+                // Styling
+                eventColor: 'hsl(260, 75%, 55%)',
+                eventBorderColor: 'hsl(260, 70%, 45%)',
+
+                // Event click
+                eventClick: function (info) {
+                    showEventDetails(info.event);
+                },
+
+                // Date select
+                select: function (info) {
+                    // Could add functionality to create new event
+                    console.log('Selected:', info);
+                },
+
+                // Custom event rendering
+                eventDidMount: function (info) {
+                    // Add custom styling based on event properties
+                    if (info.event.extendedProps.hasConflict) {
+                        info.el.style.backgroundColor = 'var(--danger-500)';
+                        info.el.style.borderColor = 'var(--danger-600)';
+                    }
+                }
+            });
+
+            calendar.render();
+            loadScheduleData();
+        });
+
+        // Load schedule data
+        async function loadScheduleData() {
+            try {
+                showLoading();
+                scheduleData = await API.schedule.getAll();
+
+                // Convert to FullCalendar events
+                const events = scheduleData.map(item => ({
+                    id: item.id,
+                    title: `${item.coursNom || 'Cours'}\n${item.salleNom || ''}`,
+                    start: `${item.date}T${item.heure}`,
+                    end: calculateEndTime(item.date, item.heure, item.duree || 2),
+                    extendedProps: {
+                        formateur: item.formateurNom,
+                        salle: item.salleNom,
+                        groupe: item.groupeNom,
+                        hasConflict: item.hasConflict || false,
+                        ...item
+                    }
+                }));
+
+                calendar.removeAllEvents();
+                calendar.addEventSource(events);
+
+                // Check for conflicts
+                checkConflicts(scheduleData);
+
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading schedule:', error);
+                hideLoading();
+                showToast('Erreur lors du chargement du planning', 'danger');
+            }
+        }
+
+        // Calculate end time
+        function calculateEndTime(date, startTime, durationHours) {
+            const start = new Date(`${date}T${startTime}`);
+            start.setHours(start.getHours() + durationHours);
+            return start.toISOString();
+        }
+
+        // Check for conflicts
+        function checkConflicts(data) {
+            const conflictsAlert = document.getElementById('conflicts-alert');
+            const conflictsMessage = document.getElementById('conflicts-message');
+
+            const conflicts = data.filter(item => item.hasConflict);
+
+            if (conflicts.length > 0) {
+                conflictsAlert.style.display = 'flex';
+                conflictsMessage.textContent = `${conflicts.length} conflit(s) détecté(s) dans le planning. Veuillez vérifier les créneaux en rouge.`;
+            } else {
+                conflictsAlert.style.display = 'none';
+            }
+        }
+
+        // Show event details
+        function showEventDetails(event) {
+            const props = event.extendedProps;
+
+            const modal = new Modal('event-details-modal');
+
+            const content = `
+        <div style="padding: 20px 0;">
+          <div style="margin-bottom: 20px;">
+            <div style="font-size: 0.875rem; color: var(--text-tertiary); margin-bottom: 4px;">Cours</div>
+            <div style="font-size: 1.25rem; font-weight: 600;">${event.title.split('\n')[0]}</div>
+          </div>
+
+          <div style="display: grid; gap: 16px;">
+            <div>
+              <div style="font-size: 0.875rem; color: var(--text-tertiary); margin-bottom: 4px;">📅 Date et heure</div>
+              <div>${formatDate(event.start)} - ${formatTime(event.start.toTimeString())}</div>
+            </div>
+
+            ${props.formateur ? `
+              <div>
+                <div style="font-size: 0.875rem; color: var(--text-tertiary); margin-bottom: 4px;">👨‍🏫 Formateur</div>
+                <div>${props.formateur}</div>
+              </div>
+            ` : ''}
+
+            ${props.salle ? `
+              <div>
+                <div style="font-size: 0.875rem; color: var(--text-tertiary); margin-bottom: 4px;">🏢 Salle</div>
+                <div>${props.salle}</div>
+              </div>
+            ` : ''}
+
+            ${props.groupe ? `
+              <div>
+                <div style="font-size: 0.875rem; color: var(--text-tertiary); margin-bottom: 4px;">👥 Groupe</div>
+                <div>${props.groupe}</div>
+              </div>
+            ` : ''}
+
+            ${props.hasConflict ? `
+              <div class="alert alert-danger" style="margin-top: 8px;">
+                <div class="alert-icon">⚠️</div>
+                <div class="alert-content">
+                  <div class="alert-title">Conflit détecté</div>
+                  <div>Ce créneau présente un conflit de ressources</div>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+
+            const footer = `
+        <button class="btn btn-secondary" onclick="closeModal('event-details-modal')">Fermer</button>
+      `;
+
+            modal.create('Détails du Cours', content, footer);
+            modal.open();
+        }
+
+        // Export schedule
+        function exportSchedule() {
+            try {
+                const dataStr = JSON.stringify(scheduleData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `planning_${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                showToast('Planning exporté avec succès', 'success');
+            } catch (error) {
+                console.error('Error exporting schedule:', error);
+                showToast('Erreur lors de l\'export', 'danger');
+            }
+        }
+    </script>
+
+    <style>
+        /* FullCalendar custom styling */
+        #calendar {
+            padding: 20px;
+        }
+
+        .fc {
+            --fc-border-color: var(--border-color);
+            --fc-button-bg-color: var(--primary-500);
+            --fc-button-border-color: var(--primary-600);
+            --fc-button-hover-bg-color: var(--primary-600);
+            --fc-button-hover-border-color: var(--primary-700);
+            --fc-button-active-bg-color: var(--primary-700);
+            --fc-button-active-border-color: var(--primary-800);
+            --fc-today-bg-color: hsla(var(--primary-hue), 70%, 50%, 0.1);
+        }
+
+        .fc-theme-standard td,
+        .fc-theme-standard th {
+            border-color: var(--border-color);
+        }
+
+        .fc-col-header-cell {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            font-weight: 600;
+            padding: 12px 0;
+        }
+
+        .fc-timegrid-slot {
+            height: 3em;
+        }
+
+        .fc-timegrid-slot-label {
+            color: var(--text-secondary);
+        }
+
+        .fc-event {
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        .fc-event:hover {
+            transform: scale(1.02);
+        }
+
+        .fc-event-title {
+            font-weight: 500;
+            white-space: pre-line;
+        }
+
+        .fc-daygrid-day-number {
+            color: var(--text-primary);
+            padding: 8px;
+        }
+
+        .fc-scrollgrid {
+            border-color: var(--border-color);
+        }
+    </style>
+</body>
+
+</html>
